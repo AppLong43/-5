@@ -1,10 +1,10 @@
-Методические рекомендации по работе в ОС семейства ALT Linux
+                                                #Методические рекомендации по работе в ОС семейства ALT Linux
 
 
-Введение
+                                                                         #Введение
 Настоящие рекомендации содержат перечень типовых команд, применяемых при настройке сетевой подсистемы и базовых сервисов в операционных системах на платформе ALT Linux. Материал ориентирован на системных администраторов, выполняющих работы по организации сетевого взаимодействия, управлению маршрутизацией, настройке файловых систем и служб удалённого доступа.
 
-Основные разделы
+# Основные разделы
 1. Управление сетевыми интерфейсами
 Конфигурация сетевых интерфейсов осуществляется путём создания файлов в каталоге /etc/net/ifaces/. Для каждого интерфейса создаётся отдельная поддиректория, где указываются тип интерфейса, метод назначения адреса (статический или динамический) и параметры маршрутизации.
 
@@ -41,44 +41,8 @@ ipv4address с IP-адресом и маской в формате CIDR.
 6. Работа с файловыми хранилищами (RAID, NFS)
 Программный RAID настраивается с помощью mdadm. После создания массива и форматирования он монтируется в целевой каталог, запись о монтировании добавляется в /etc/fstab. Для организации сетевого файлового сервера NFS создаётся экспортируемый каталог, в файл /etc/exports добавляется правило с указанием разрешённой сети и параметров доступа. На клиенте выполняется монтирование удалённой папки командой mount.
 
-Заключение
+# Заключение
 Представленные команды и подходы являются базовыми для администрирования сетевых и серверных компонентов в среде ALT Linux. Последовательное применение описанных шагов позволяет развернуть работоспособную инфраструктуру с заданными сетевыми параметрами, обеспечить удалённый доступ и организовать общее файловое пространство.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 МОДУЛЬ 1
@@ -105,27 +69,27 @@ HQ-CLI	enp7s1.200 (к HQ-RTR)	192.168.200.2	/28	200	192.168.200.0/28	192.168.200
 
 1.1 Настройка имени хоста (FQDN) и часового пояса на всех машинах
 
-# ISP
+ISP
 hostnamectl hostname ISP && exec bash
 timedatectl set-timezone Europe/Tver
 
-# HQ-RTR
+HQ-RTR
 hostnamectl hostname hq-rtr.au-team.irpo && exec bash
 timedatectl set-timezone Europe/ Tver
 
-# BR-RTR
+BR-RTR
 hostnamectl hostname br-rtr.au-team.irpo && exec bash
 timedatectl set-timezone Europe/ Tver
 
-# HQ-SRV
+HQ-SRV
 hostnamectl hostname HQ-SRV.au-team.irpo && exec bash
 timedatectl set-timezone Europe/ Tver
 
-# BR-SRV
+BR-SRV
 hostnamectl hostname BR-SRV.au-team.irpo && exec bash
 timedatectl set-timezone Europe/ Tver
 
-# HQ-CLI
+HQ-CLI
 hostnamectl hostname HQ-CLI.au-team.irpo && exec bash
 timedatectl set-timezone Europe/ Tver
 Проверка: hostname → timedatectl
@@ -136,7 +100,7 @@ timedatectl set-timezone Europe/ Tver
 
 2.1 Настройка интерфейсов ISP
 
-# Внешний интерфейс (DHCP от вышестоящего роутера)
+Внешний интерфейс (DHCP от вышестоящего роутера)
 mkdir -p /etc/net/ifaces/enp7s1
 cat > /etc/net/ifaces/enp7s1/options << EOF
 BOOTPROTO=dhcp
@@ -145,11 +109,11 @@ DISABLED=no
 NM_CONTROLLED=no
 EOF
 
-# Внутренние интерфейсы
+Внутренние интерфейсы
 mkdir -p /etc/net/ifaces/enp7s{2,3}
 echo 'TYPE=eth' | tee /etc/net/ifaces/enp7s{2,3}/options
 
-# IP для HQ-RTR и BR-RTR
+IP для HQ-RTR и BR-RTR
 echo '172.16.1.1/28' > /etc/net/ifaces/enp7s2/ipv4address
 echo '172.16.2.1/28' > /etc/net/ifaces/enp7s3/ipv4address
 
@@ -213,7 +177,7 @@ echo '192.168.200.1/28' > /etc/net/ifaces/enp7s2.200/ipv4address
 echo '192.168.99.1/29' > /etc/net/ifaces/enp7s2.999/ipv4address
 4.2 Настройка VLAN на HQ-SRV и HQ-CLI
 
-# HQ-SRV (VLAN 100)
+HQ-SRV (VLAN 100)
 mkdir -p /etc/net/ifaces/enp7s1.100
 cat > /etc/net/ifaces/enp7s1.100/options << EOF
 TYPE=vlan
@@ -230,7 +194,7 @@ echo 'nameserver 8.8.8.8' > /etc/net/ifaces/enp7s1.100/resolv.conf
 systemctl restart network
 ping zz.ru -c3
 
-# HQ-CLI (VLAN 200)
+HQ-CLI (VLAN 200)
 mkdir -p /etc/net/ifaces/enp7s1.200
 cat > /etc/net/ifaces/enp7s1.200/options << EOF
 TYPE=vlan
@@ -483,47 +447,47 @@ rpm -qa | grep yandex
 2. Настройка NFS-сервера на HQ-SRV
 
 HQ-SRV
-# Проверка установки пакета
+Проверка установки пакета
 rpm -qa | grep nfs
 
-# Запуск NFS-сервера
+Запуск NFS-сервера
 systemctl enable --now nfs-server
 systemctl status nfs-server
 
-# Создание папки для расшаривания
+Создание папки для расшаривания
 mkdir -p /raid0/nfs
 chmod 777 /raid0/nfs
 
-# Настройка экспорта (ВНИМАНИЕ: сеть HQ-CLI 192.168.200.0/28!)
+Настройка экспорта (ВНИМАНИЕ: сеть HQ-CLI 192.168.200.0/28!)
 cat >> /etc/exports << EOF
 /raid0/nfs 192.168.200.0/28(rw,sync,no_subtree_check)
 EOF
 
-# Применение настроек
+Применение настроек
 exportfs -ra
 
-# Проверка
+Проверка
 exportfs -v
 
 HQ-CLI
-# Проверка установки пакета
+Проверка установки пакета
 rpm -qa | grep nfs
 
-# Создание точки монтирования
+Создание точки монтирования
 mkdir -p /mnt/nfs
 
-# Монтирование (IP HQ-SRV = 192.168.100.2)
+Монтирование (IP HQ-SRV = 192.168.100.2)
 mount -t nfs 192.168.100.2:/raid0/nfs /mnt/nfs
 
-# Проверка монтирования
+Проверка монтирования
 df -h | grep nfs
 
-# Добавление в автозагрузку (/etc/fstab)
+Добавление в автозагрузку (/etc/fstab)
 cat >> /etc/fstab << EOF
 192.168.100.2:/raid0/nfs /mnt/nfs nfs defaults,_netdev 0 0
 EOF
 
-# Проверка fstab
+Проверка fstab
 mount -a
 
 Проверка
@@ -535,42 +499,43 @@ ls -la /raid0/nfs/
 
 3. Конфигурация файлового хранилища на HQ-SRV.
 
-# Установка пакета
+Установка пакета
 apt-get update && apt-get install mdadm -y
 
-# Проверка доступных дисков
+Проверка доступных дисков
 lsblk
 
-# Создание RAID 0 из двух дисков
+Создание RAID 0 из двух дисков
 mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sdb /dev/sdc
 
-# Проверка статуса
+Проверка статуса
 cat /proc/mdstat
 mdadm --detail /dev/md0
 
-# Форматирование в ext4
+Форматирование в ext4
 mkfs.ext4 /dev/md0
 
-# Сохранение конфигурации RAID
+Сохранение конфигурации RAID
 mkdir -p /etc/mdadm 2>/dev/null
 echo "DEVICE partitions" > /etc/mdadm.conf
 mdadm --detail --scan >> /etc/mdadm.conf
 
-# Проверка
+Проверка
 cat /etc/mdadm.conf
 
-# Создание точки монтирования
+Создание точки монтирования
 mkdir -p /raid0
 
-# Добавление в /etc/fstab
+Добавление в /etc/fstab
 echo -e "/dev/md0\t/raid0\text4\tdefaults\t0\t0" >> /etc/fstab
 
-# Проверка монтирования
+Проверка монтирования
 mount -av
-# Проверка смонтированных файловых систем
+
+Проверка смонтированных файловых систем
 df -h | grep raid0
 
-# Проверка дисков и RAID
+Проверка дисков и RAID
 lsblk
 cat /proc/mdstat
 mdadm --detail /dev/md0
@@ -579,133 +544,133 @@ mdadm --detail /dev/md0
 
 HQ-RTR
 
-# В режиме конфигурации (config)
+В режиме конфигурации (config)
 config terminal
 
-# Статическая трансляция портов для HQ-SRV
-# Проброс порта 80 (HTTP) на внешний IP 172.16.1.2:8080
+Статическая трансляция портов для HQ-SRV
+Проброс порта 80 (HTTP) на внешний IP 172.16.1.2:8080
 ip nat source static tcp 192.168.100.2 80 172.16.1.2 8080
 
-# Проброс порта 2026 (SSH) на внешний IP 172.16.1.2:2026
+Проброс порта 2026 (SSH) на внешний IP 172.16.1.2:2026
 ip nat source static tcp 192.168.100.2 2026 172.16.1.2 2026
 
-# Выход и сохранение
+Выход и сохранение
 exit
 write memory
 
 BR-RTR
 
-# В режиме конфигурации (config)
+В режиме конфигурации (config)
 config terminal
 
-# Статическая трансляция портов для BR-SRV
-# Проброс порта 8080 на внешний IP 172.16.2.2:8080
+Статическая трансляция портов для BR-SRV
+Проброс порта 8080 на внешний IP 172.16.2.2:8080
 ip nat source static tcp 192.168.1.2 8080 172.16.2.2 8080
 
-# Проброс порта 2026 (SSH) на внешний IP 172.16.2.2:2026
+Проброс порта 2026 (SSH) на внешний IP 172.16.2.2:2026
 ip nat source static tcp 192.168.1.2 2026 172.16.2.2 2026
 
-# Выход и сохранение
+Выход и сохранение
 exit
 write memory
 
 ISP (проверка)
-# Установка curl для проверки
+Установка curl для проверки
 apt-get update && apt-get install curl -y
 
-# Проверка проброса порта 8080 на HQ-SRV (через HQ-RTR)
+Проверка проброса порта 8080 на HQ-SRV (через HQ-RTR)
 curl http://172.16.1.2:8080
 
-# Проверка проброса порта 8080 на BR-SRV (через BR-RTR)
+Проверка проброса порта 8080 на BR-SRV (через BR-RTR)
 curl http://172.16.2.2:8080
 
-# Проверка SSH до HQ-SRV (через HQ-RTR)
+Проверка SSH до HQ-SRV (через HQ-RTR)
 ssh sshuser@172.16.1.2 -p 2026
 
-# Проверка SSH до BR-SRV (через BR-RTR)
+Проверка SSH до BR-SRV (через BR-RTR)
 ssh sshuser@172.16.2.2 -p 2026
 
 5. Настройте службу сетевого времени на базе сервиса chrony на маршрутизаторе ISP
 
 ISP
 
-# Установка chrony
+Установка chrony
 apt-get update && apt-get install chrony -y
 
-# Редактируем конфиг
+Редактируем конфиг
 nano /etc/chrony.conf
 
-# Внешние серверы времени
+Внешние серверы времени
 pool pool.ntp.org iburst
 
-# Локальный стратум 5 (если нет доступа к внешним серверам)
+Локальный стратум 5 (если нет доступа к внешним серверам)
 local stratum 5
 
-# Разрешаем доступ клиентам (ВАШИ СЕТИ)
+Разрешаем доступ клиентам (ВАШИ СЕТИ)
 allow 172.16.1.0/28      # сеть к HQ-RTR
 allow 172.16.2.0/28      # сеть к BR-RTR
 allow 192.168.100.0/27   # сеть HQ-SRV
 allow 192.168.200.0/28   # сеть HQ-CLI
 allow 192.168.1.0/28     # сеть BR-SRV
 
-# Запуск и проверка
+Запуск и проверка
 systemctl enable --now chronyd
 systemctl restart chronyd
 chronyc tracking
 
 На HQ-SRV и HQ-CLI
 
-# Установка chrony
+Установка chrony
 apt-get update && apt-get install chrony -y
 
-# Редактируем конфиг
+Редактируем конфиг
 nano /etc/chrony.conf
 
-# На HQ-SRV и HQ-CLI
+На HQ-SRV и HQ-CLI
 sed -i 's/^pool pool.ntp.org iburst/#&/' /etc/chrony.conf
 echo "server 172.16.1.1 iburst" >> /etc/chrony.conf
 systemctl restart chronyd
 
-# Добавить:
+Добавить:
 server 172.16.1.1 iburst
 
-# Запуск
+Запуск
 systemctl enable --now chronyd
 systemctl restart chronyd
 chronyc sources
 
 На BR-SRV:
 
-# Установка chrony
+Установка chrony
 apt-get update && apt-get install chrony -y
 
-# Редактируем конфиг
+Редактируем конфиг
 nano /etc/chrony.conf
 
-# На BR-SRV
+На BR-SRV
 sed -i 's/^pool pool.ntp.org iburst/#&/' /etc/chrony.conf
 echo "server 172.16.2.1 iburst" >> /etc/chrony.conf
 systemctl restart chronyd
 
-# Добавить:
+Добавить:
 server 172.16.2.1 iburst
-# Запуск
+Запуск
 systemctl enable --now chronyd
 systemctl restart chronyd
 chronyc sources
 
 BR-RTR (EcoRouter)
 
-# В режиме конфигурации
+В режиме конфигурации
 configure terminal
 
-# Указываем NTP-сервер
+Указываем NTP-сервер
 ntp server 172.16.2.1
 
-# Сохраняем
+Сохраняем
 write memory
 
-# Проверка
+Проверка
 show ntp status
 show ntp date
 
